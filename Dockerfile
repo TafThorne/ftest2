@@ -35,13 +35,18 @@ FROM tafthorne/ncat-centos
 LABEL \
  Description="Basic CentOS environment with a number of libraries configured" \
  MAINTAINER="Thomas Thorne <TafThorne@GoogleMail.com>"
+ARG prefix=/usr
+ARG binPath=$prefix/bin
+ARG libPath=$prefix/lib
 USER 0
 # Copy over pre-made tools
 # Protocol Buffer
-COPY --from=builder /usr/local/lib/libproto* /usr/local/lib/
+COPY --from=builder /usr/local/lib/libproto* $libPath/
 # gRPC
-COPY --from=builder /usr/local/lib/libgrpc* /usr/local/lib/
-COPY --from=builder /usr/local/lib/libaddress_sorting.so.6.0.0 /usr/local/lib/
+COPY --from=builder /usr/local/lib/libaddress_sorting.so.6.0.0 $libPath/
+COPY --from=builder /usr/local/lib/libgpr* $libPath/
+COPY --from=builder /usr/local/lib/libgrpc* $libPath/
+RUN ldconfig
 # Install remaining tools using yum
 RUN \
   yum install install -y epel-release && \
