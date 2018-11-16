@@ -13,6 +13,7 @@ RUN \
     libc++-dev \
     libgflags-dev \
     libgtest-dev \
+    gflags-devel \
     libtool \
     which
 RUN \
@@ -28,7 +29,8 @@ RUN \
     make -j$(nproc) && make install && make clean && ldconfig && \
     echo "--- installing grpc ---" && \
     cd /var/local/git/grpc && \
-    make -j$(nproc) && make install && make clean && ldconfig
+    make -j$(nproc) && make install && make clean && ldconfig && \
+    make -j$(nproc) grpc_cli
 
 # Put the main image together
 FROM tafthorne/ncat-centos
@@ -47,11 +49,14 @@ COPY --from=builder /usr/local/lib/libaddress_sorting.so.6.0.0 $libPath/
 COPY --from=builder /usr/local/lib/libgpr* $libPath/
 COPY --from=builder /usr/local/lib/libgrpc* $libPath/
 RUN ldconfig
+# grpc_cli
+COPY --from=builder /var/local/git/grpc/bins/opt/grpc_cli $binPath/
 # Install remaining tools using yum
 RUN \
   yum install install -y epel-release && \
   yum-config-manager --enable epel && \
   yum install -y \
+    gflags \
     hdf5 \
     libuuid-devel
 
