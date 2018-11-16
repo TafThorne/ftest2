@@ -5,15 +5,14 @@ FROM tafthorne/make-devtoolset-7-toolchain-centos7 as builder
 USER 0
 ADD https://github.com/cpputest/cpputest/releases/download/v3.8/cpputest-3.8.tar.gz /tmp/
 RUN \
-  yum install -y \
+  yum install install -y epel-release && \
+  yum --setopt=skip_missing_names_on_install=False install -y \
     automake \
     autoconf \
     clang \
     git \
-    libc++-dev \
-    libgflags-dev \
-    libgtest-dev \
     gflags-devel \
+    gtest-devel \
     libtool \
     which
 RUN \
@@ -55,7 +54,7 @@ COPY --from=builder /var/local/git/grpc/bins/opt/grpc_cli $binPath/
 RUN \
   yum install install -y epel-release && \
   yum-config-manager --enable epel && \
-  yum install -y \
+  yum --setopt=skip_missing_names_on_install=False install -y \
     gflags \
     hdf5 \
     libuuid-devel
